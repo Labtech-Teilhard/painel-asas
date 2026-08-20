@@ -143,6 +143,12 @@ dialog .dh{padding:18px 20px 0} dialog h2{font-size:17px;font-weight:700;margin:
 dialog .dc{padding:8px 20px 16px} dialog p{font-size:13.5px;color:var(--tx2);margin:0 0 11px;line-height:1.5}
 dialog .df{display:flex;gap:8px;justify-content:flex-end;padding:13px 20px;border-top:1px solid var(--li);background:var(--card2);flex-wrap:wrap}
 dialog textarea{width:100%;height:180px;font-family:var(--m);font-size:11.5px;border:1px solid var(--li2);border-radius:6px;padding:9px;background:var(--bg);resize:vertical}
+.est{font-size:11.5px;font-weight:600;letter-spacing:.03em;padding:3px 9px;border-radius:11px;white-space:nowrap}
+.est.publicado{background:var(--feito-bg);color:var(--feito)}
+.est.nao-publicado{background:var(--anda-bg);color:var(--anda)}
+.barra-nova{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--anda-bg);border:1px solid var(--anda);
+  border-radius:8px;padding:11px 14px;margin:16px 0 0;font-size:13px;color:var(--tx)}
+.barra-nova span{flex:1;min-width:220px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(8px);background:var(--tx);color:var(--bg);font-size:13px;font-weight:500;padding:9px 16px;border-radius:7px;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;z-index:80}
 .toast.v{opacity:1;transform:translateX(-50%)}
 </style>
@@ -154,6 +160,7 @@ dialog textarea{width:100%;height:180px;font-family:var(--m);font-size:11.5px;bo
   <button class="b g" id="tema" title="Tema" aria-label="Alternar tema">◐</button>
   <button class="b" id="importar">Importar</button>
   <button class="b" id="baixar">Baixar</button>
+  <span class="est" id="estado"></span>
   <button class="b p" id="publicar">Publicar</button>
 </div></header>
 
@@ -205,6 +212,7 @@ const RAMO = 'main', ARQ = 'dados.json';
    status: 'falta' | 'anda' | 'feito'   ·   prazo: 'AAAA-MM-DD' ou ''
    ──────────────────────────────────────────────────────────────────────── */
 const SEMENTE = {
+  rev: 1,
   meta: { atualizado:'2026-08-20',
     fonte:'Estrutura e modelo de preenchimento: planilha Pendências do Sistema ASAS (20/08/2026). Estado da documentação medido na pasta do OneDrive em 20/08/2026: 37 documentos não-obsoletos, 35 .md e 35 .docx, 26 já acima da v1.0, e 0 com aprovador preenchido.' },
   frentes: ['CIApp','Visual 3D Hair','Ábaco','Planejamento e Admin','PEP','Documentações','Nuvem'],
@@ -283,15 +291,70 @@ const cofre = { ler:k=>{try{return localStorage.getItem(k)}catch(e){return null}
 let D=null, fFrente=null, fResp='', fAtraso=false;
 const atrasada = a => a.p && a.s!=='feito' && a.p < hoje();
 
-function gravar(){ D.meta.atualizado=hoje(); cofre.gravar(K,JSON.stringify(D)); }
+let sujo = false;
+function gravar(){ D.meta.atualizado=hoje(); sujo=true;
+  cofre.gravar(K, JSON.stringify({doc:D, sujo:true})); marcarEstado('nao-publicado'); }
+
+/* Estado da publicação, no canto do topo, para ninguém achar que salvou quando não salvou. */
+function marcarEstado(e){
+  const el=$('#estado'); if(!el) return;
+  el.className='est '+e;
+  el.textContent = e==='publicado' ? 'publicado' : e==='nao-publicado' ? 'não publicado' : '';
+}
+
+const copiarDoc = o => typeof structuredClone==='function' ? structuredClone(o) : JSON.parse(JSON.stringify(o));
+const rev = o => (o && +o.rev) || 0;
+
+async function buscarPublicado(){
+  try { const r = await fetch(ARQ+'?v='+Date.now(),{cache:'no-store'});
+        if(r.ok){ const j=await r.json(); if(Array.isArray(j.atividades)) return j; } } catch(e){}
+  return null;
+}
 
 async function carregar(){
-  let base = SEMENTE;
-  try { const r = await fetch(ARQ,{cache:'no-store'}); if(r.ok) base = await r.json(); } catch(e){}
-  let loc=null; try{ loc = JSON.parse(cofre.ler(K)||'null'); }catch(e){}
-  const esc_ = (loc && Array.isArray(loc.atividades)) ? loc : base;
-  D = typeof structuredClone==='function' ? structuredClone(esc_) : JSON.parse(JSON.stringify(esc_));
+  const publicado = await buscarPublicado() || SEMENTE;
+  let g=null; try{ g = JSON.parse(cofre.ler(K)||'null'); }catch(e){}
+  const local = g && g.doc && Array.isArray(g.doc.atividades) ? g.doc : null;
+  sujo = !!(g && g.sujo);
+
+  // Sem cópia local, ou a publicada é mais nova e não há edição pendente:
+  // a publicada vence. É isso que faz "publicou, todo mundo vê".
+  if(!local || (rev(publicado) > rev(local) && !sujo)){
+    D = copiarDoc(publicado); sujo=false;
+    cofre.gravar(K, JSON.stringify({doc:D, sujo:false}));
+    marcarEstado('publicado');
+    if(local) aviso('Carregada a versão publicada por outra pessoa');
+    return;
+  }
+  D = copiarDoc(local);
+  marcarEstado(sujo ? 'nao-publicado' : 'publicado');
+  // Edição pendente e alguém publicou por cima: quem decide é a pessoa.
+  if(rev(publicado) > rev(local) && sujo) banner(publicado);
 }
+
+/* Aviso de versão mais nova, com a escolha na mão de quem está editando. */
+function banner(pub){
+  document.getElementById('barra-nova')?.remove();
+  const el=document.createElement('div'); el.id='barra-nova'; el.className='barra-nova';
+  el.innerHTML = `<span>Outra pessoa publicou uma versão mais nova (rev ${rev(pub)}) e você tem edições não publicadas.</span>
+    <button class="b" id="bn-ver">Carregar a nova e descartar as minhas</button>
+    <button class="b g" id="bn-fica">Continuar com as minhas</button>`;
+  document.querySelector('main').prepend(el);
+  el.querySelector('#bn-ver').onclick=()=>{ D=copiarDoc(pub); sujo=false;
+    cofre.gravar(K,JSON.stringify({doc:D,sujo:false})); el.remove(); pintar(); marcarEstado('publicado'); aviso('Versão publicada carregada'); };
+  el.querySelector('#bn-fica').onclick=()=>el.remove();
+}
+
+/* Uma aba aberta o dia todo tem de perceber quando alguém publica. */
+async function conferirPublicado(){
+  const pub = await buscarPublicado(); if(!pub) return;
+  if(rev(pub) <= rev(D)) return;
+  if(sujo){ banner(pub); return; }
+  D = copiarDoc(pub); cofre.gravar(K,JSON.stringify({doc:D,sujo:false}));
+  pintar(); marcarEstado('publicado'); aviso('Atualizado: alguém publicou uma versão nova');
+}
+setInterval(conferirPublicado, 60000);
+addEventListener('focus', conferirPublicado);
 
 const visiveis = ()=> D.atividades.filter(a =>
   (!fFrente || a.f===fFrente) && (!fResp || a.r===fResp) && (!fAtraso || atrasada(a)));
@@ -407,9 +470,13 @@ $('#baixar').addEventListener('click',()=>{
   document.body.append(a);a.click();a.remove();URL.revokeObjectURL(u);aviso('dados.json baixado');});
 async function copiar(){try{await navigator.clipboard.writeText(txt());return true}catch(e){$('#pub-json').select();return document.execCommand('copy')}}
 $('#publicar').addEventListener('click',async()=>{
-  $('#pub-json').value=txt();
+  const pub = await buscarPublicado();
+  D.rev = Math.max(rev(D), rev(pub)) + 1;   // sempre acima do que já está no ar
+  D.meta.atualizado = hoje();
+  cofre.gravar(K, JSON.stringify({doc:D, sujo:false})); sujo=false; marcarEstado('publicado');
+  $('#pub-json').value = txt();
   if(!REPO){aviso('Falta preencher REPO no topo do arquivo — baixando o dados.json');$('#baixar').click();return;}
-  $('#d-pub').showModal(); if(await copiar()) aviso('Dados copiados');});
+  $('#d-pub').showModal(); if(await copiar()) aviso(`Dados copiados — revisão ${D.rev}`);});
 $('#copiar').addEventListener('click',async()=>{if(await copiar())aviso('Dados copiados')});
 $('#abrir-gh').addEventListener('click',()=>window.open(`https://github.com/${REPO}/edit/${RAMO}/${ARQ}`,'_blank','noopener'));
 $('#importar').addEventListener('click',()=>{$('#imp-json').value='';$('#d-imp').showModal()});
