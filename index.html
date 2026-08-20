@@ -146,6 +146,9 @@ dialog textarea{width:100%;height:180px;font-family:var(--m);font-size:11.5px;bo
 .est{font-size:11.5px;font-weight:600;letter-spacing:.03em;padding:3px 9px;border-radius:11px;white-space:nowrap}
 .est.publicado{background:var(--feito-bg);color:var(--feito)}
 .est.nao-publicado{background:var(--anda-bg);color:var(--anda)}
+.est.salvando{background:var(--azul-bg);color:var(--azul)}
+.est.salvo{background:var(--feito-bg);color:var(--feito)}
+.est.erro{background:var(--falta-bg);color:var(--falta)}
 .barra-nova{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--anda-bg);border:1px solid var(--anda);
   border-radius:8px;padding:11px 14px;margin:16px 0 0;font-size:13px;color:var(--tx)}
 .barra-nova span{flex:1;min-width:220px}
@@ -206,6 +209,13 @@ dialog textarea{width:100%;height:180px;font-family:var(--m);font-size:11.5px;bo
 <script>
 /* ─── configuração: a única linha a preencher ───────────────────────────── */
 const REPO = 'Labtech-Teilhard/painel-asas';
+
+/* ─── Gravação compartilhada ──────────────────────────────────────────────
+   Preencha UM dos dois e o painel passa a salvar sozinho. Nenhum dos dois
+   preenchido: modo manual (editar → Publicar), que é como está hoje.       */
+const API    = '';   // hospedagem própria: https://seudominio.com.br/painel/api.php
+const SB_URL = 'https://ndkguwtcvvuqskxjoact.supabase.co';   // Supabase: https://xxxxxxxx.supabase.co
+const SB_KEY = 'sb_publishable_Xr2iweWKOXgefa7vQyB8OQ_PBpL_jSo';   // Supabase: chave anon / publishable
 const RAMO = 'main', ARQ = 'dados.json';
 
 /* ─── os dados ──────────────────────────────────────────────────────────────
@@ -291,15 +301,80 @@ const cofre = { ler:k=>{try{return localStorage.getItem(k)}catch(e){return null}
 let D=null, fFrente=null, fResp='', fAtraso=false;
 const atrasada = a => a.p && a.s!=='feito' && a.p < hoje();
 
-let sujo = false;
+let sujo = false, salvando = false, tSalvar = null;
+const SB = !!(SB_URL && SB_KEY);
+const NUVEM = !!API || SB;
+const sbCab = () => ({ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' });
+
+/* ─── gravação compartilhada ─────────────────────────────────────────────── */
+async function nuvemLer(){
+  if(!NUVEM) return null;
+  try{
+    if(SB){
+      const r = await fetch(`${SB_URL}/rest/v1/painel?id=eq.asas&select=doc,rev`,{headers:sbCab()});
+      if(!r.ok) return null;
+      const l = await r.json();
+      if(!l.length || !l[0].doc || !Array.isArray(l[0].doc.atividades)) return null;
+      return { ...l[0].doc, rev: l[0].rev };
+    }
+    const r = await fetch(API+'?v='+Date.now(), {cache:'no-store'});
+    if(!r.ok) return null;
+    const d = await r.json();
+    return (d && Array.isArray(d.atividades)) ? d : null;
+  }catch(e){ return null; }
+}
+
+async function nuvemGravar(){
+  if(!NUVEM) return false;
+  salvando = true; marcarEstado('salvando');
+  const tentativa = { ...D, rev: rev(D) + 1, meta: { ...D.meta, atualizado: hoje() } };
+  try{
+    let r;
+    if(SB){
+      // O Supabase não recusa gravação atrasada sozinho: comparo antes de mandar.
+      const atual = await nuvemLer();
+      if(atual && rev(atual) >= tentativa.rev){
+        salvando=false; marcarEstado('nao-publicado'); banner(atual); return false;
+      }
+      r = await fetch(`${SB_URL}/rest/v1/painel?id=eq.asas`,{ method:'PATCH',
+            headers:{...sbCab(), Prefer:'return=minimal'},
+            body: JSON.stringify({ doc: tentativa, rev: tentativa.rev,
+                                   atualizado_em: new Date().toISOString() }) });
+    } else {
+      r = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'},
+                             body: JSON.stringify(tentativa) });
+    }
+    salvando = false;
+    if(r.status === 409){
+      // Outra pessoa gravou no meio. O servidor devolve o que está no ar;
+      // quem decide o que fazer é quem está editando, não o último a digitar.
+      const c = await r.json().catch(()=>null);
+      marcarEstado('nao-publicado');
+      if(c && c.doc && Array.isArray(c.doc.atividades)) banner(c.doc);
+      return false;
+    }
+    if(!r.ok){ marcarEstado('erro'); return false; }
+    D = tentativa; sujo = false;
+    cofre.gravar(K, JSON.stringify({doc:D, sujo:false}));
+    marcarEstado('salvo'); return true;
+  }catch(e){ salvando=false; marcarEstado('erro'); return false; }
+}
+
+function agendarSalvar(){
+  if(!NUVEM) return;
+  clearTimeout(tSalvar);
+  tSalvar = setTimeout(nuvemGravar, 1200);   // espera parar de digitar
+}
 function gravar(){ D.meta.atualizado=hoje(); sujo=true;
-  cofre.gravar(K, JSON.stringify({doc:D, sujo:true})); marcarEstado('nao-publicado'); }
+  cofre.gravar(K, JSON.stringify({doc:D, sujo:true}));
+  if(NUVEM){ marcarEstado('salvando'); agendarSalvar(); } else marcarEstado('nao-publicado'); }
 
 /* Estado da publicação, no canto do topo, para ninguém achar que salvou quando não salvou. */
+const ROTULO = { publicado:'publicado', 'nao-publicado':'não publicado',
+                 salvando:'salvando…', salvo:'salvo para a equipe', erro:'não consegui salvar' };
 function marcarEstado(e){
   const el=$('#estado'); if(!el) return;
-  el.className='est '+e;
-  el.textContent = e==='publicado' ? 'publicado' : e==='nao-publicado' ? 'não publicado' : '';
+  el.className='est '+e; el.textContent = ROTULO[e] || '';
 }
 
 const copiarDoc = o => typeof structuredClone==='function' ? structuredClone(o) : JSON.parse(JSON.stringify(o));
@@ -312,7 +387,7 @@ async function buscarPublicado(){
 }
 
 async function carregar(){
-  const publicado = await buscarPublicado() || SEMENTE;
+  const publicado = (NUVEM && await nuvemLer()) || await buscarPublicado() || SEMENTE;
   let g=null; try{ g = JSON.parse(cofre.ler(K)||'null'); }catch(e){}
   const local = g && g.doc && Array.isArray(g.doc.atividades) ? g.doc : null;
   sujo = !!(g && g.sujo);
@@ -347,13 +422,14 @@ function banner(pub){
 
 /* Uma aba aberta o dia todo tem de perceber quando alguém publica. */
 async function conferirPublicado(){
-  const pub = await buscarPublicado(); if(!pub) return;
+  if(salvando) return;
+  const pub = (NUVEM && await nuvemLer()) || (!NUVEM && await buscarPublicado()); if(!pub) return;
   if(rev(pub) <= rev(D)) return;
   if(sujo){ banner(pub); return; }
   D = copiarDoc(pub); cofre.gravar(K,JSON.stringify({doc:D,sujo:false}));
   pintar(); marcarEstado('publicado'); aviso('Atualizado: alguém publicou uma versão nova');
 }
-setInterval(conferirPublicado, 60000);
+setInterval(conferirPublicado, NUVEM ? 10000 : 60000);
 addEventListener('focus', conferirPublicado);
 
 const visiveis = ()=> D.atividades.filter(a =>
