@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel do ASAS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg:#F4F5F7; --card:#FFFFFF; --card2:#FAFBFC;
+  --tx:#1A1D21; --tx2:#5A646E; --tx3:#8A949E;
+  --li:#E1E5EA; --li2:#CDD4DB;
+
+  --falta:#C2402D;   --falta-bg:#FCEBE8;
+  --anda:#B07A10;    --anda-bg:#FDF3DF;
+  --feito:#1E7A4B;   --feito-bg:#E4F4EB;
+  --azul:#2F5FD0;    --azul-bg:#E8EFFD;
+
+  --f:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --m:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sh:0 1px 2px rgba(26,29,33,.06),0 4px 12px -6px rgba(26,29,33,.12);
+}
+@media (prefers-color-scheme:dark){:root:not([data-t="claro"]){
+  --bg:#0F1215; --card:#181C21; --card2:#1E232A;
+  --tx:#E6EAEE; --tx2:#A5AFB9; --tx3:#77828D;
+  --li:#282E36; --li2:#39414B;
+  --falta:#E8836F; --falta-bg:#2C1815;
+  --anda:#DCA845;  --anda-bg:#2B2312;
+  --feito:#4FB37C; --feito-bg:#11291C;
+  --azul:#7BA0F0;  --azul-bg:#141D30;
+  --sh:0 1px 2px rgba(0,0,0,.4),0 4px 12px -6px rgba(0,0,0,.6);
+}}
+:root[data-t="escuro"]{
+  --bg:#0F1215; --card:#181C21; --card2:#1E232A;
+  --tx:#E6EAEE; --tx2:#A5AFB9; --tx3:#77828D;
+  --li:#282E36; --li2:#39414B;
+  --falta:#E8836F; --falta-bg:#2C1815;
+  --anda:#DCA845;  --anda-bg:#2B2312;
+  --feito:#4FB37C; --feito-bg:#11291C;
+  --azul:#7BA0F0;  --azul-bg:#141D30;
+  --sh:0 1px 2px rgba(0,0,0,.4),0 4px 12px -6px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--f);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--azul);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.wrap{max-width:1500px;margin:0 auto;padding:0 20px}
+@media(max-width:600px){.wrap{padding:0 12px}}
+
+/* topo */
+.top{background:var(--card);border-bottom:1px solid var(--li);position:sticky;top:0;z-index:30}
+.top .in{display:flex;align-items:center;gap:12px;height:56px;flex-wrap:wrap}
+.top h1{font-size:16px;font-weight:700;margin:0;letter-spacing:-.02em;white-space:nowrap}
+.top h1 span{color:var(--tx3);font-weight:400}
+.gap{margin-left:auto}
+button,select,input,textarea{font:inherit;color:inherit}
+.b{font-size:13px;font-weight:500;background:var(--card);border:1px solid var(--li2);border-radius:6px;padding:6px 11px;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s}
+.b:hover{background:var(--card2);border-color:var(--tx3)}
+.b.p{background:var(--azul);border-color:var(--azul);color:#fff}
+.b.p:hover{filter:brightness(1.08)}
+.b.g{background:transparent;border-color:transparent;color:var(--tx3);padding:5px 8px}
+.b.g:hover{background:var(--card2);color:var(--tx)}
+.b.d{color:var(--falta);border-color:transparent;background:transparent}
+.b.d:hover{background:var(--falta-bg)}
+.b[aria-pressed=true]{background:var(--azul-bg);border-color:var(--azul);color:var(--azul)}
+
+/* resumo por frente */
+.resumo{padding:20px 0 6px}
+.resumo h2{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 12px}
+.frentes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.fr{background:var(--card);border:1px solid var(--li);border-radius:8px;padding:13px 14px;box-shadow:var(--sh);cursor:pointer;text-align:left;width:100%;transition:border-color .12s}
+.fr:hover{border-color:var(--li2)}
+.fr[aria-pressed=true]{border-color:var(--azul);box-shadow:0 0 0 1px var(--azul)}
+.fr .n{display:flex;align-items:baseline;gap:8px;margin-bottom:9px}
+.fr .n b{font-size:14.5px;font-weight:600;letter-spacing:-.015em}
+.fr .n em{font-style:normal;font-family:var(--m);font-size:11px;color:var(--tx3);margin-left:auto}
+.barra{height:6px;border-radius:3px;background:var(--li);overflow:hidden;display:flex}
+.barra i{display:block;height:100%}
+.barra .i-feito{background:var(--feito)} .barra .i-anda{background:var(--anda)}
+.fr .l{margin-top:8px;font-size:12px;color:var(--tx2);display:flex;gap:10px;flex-wrap:wrap}
+.fr .l s{text-decoration:none;font-family:var(--m);font-weight:500}
+.fr .l .c-falta{color:var(--falta)} .fr .l .c-anda{color:var(--anda)} .fr .l .c-feito{color:var(--feito)}
+
+/* filtros */
+.filtros{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:18px 0 14px}
+.filtros .r{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3)}
+select.s{background:var(--card);border:1px solid var(--li2);border-radius:6px;padding:6px 9px;font-size:13px;cursor:pointer}
+
+/* quadro */
+.quadro{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding-bottom:50px;align-items:start}
+@media(max-width:1000px){.quadro{grid-template-columns:1fr}}
+.col{background:var(--card2);border:1px solid var(--li);border-radius:8px;padding:12px;min-height:120px}
+.col > h3{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;margin:0 0 12px;letter-spacing:-.01em}
+.col > h3 .pt{width:9px;height:9px;border-radius:50%;flex:none}
+.col > h3 .qt{margin-left:auto;font-family:var(--m);font-size:12px;font-weight:500;color:var(--tx3);background:var(--card);border:1px solid var(--li);border-radius:10px;padding:1px 8px}
+.col-falta h3 .pt{background:var(--falta)} .col-anda h3 .pt{background:var(--anda)} .col-feito h3 .pt{background:var(--feito)}
+.lista{display:flex;flex-direction:column;gap:8px}
+
+/* cartao de atividade */
+.at{background:var(--card);border:1px solid var(--li);border-radius:7px;padding:11px 12px;box-shadow:var(--sh);transition:border-color .12s}
+.at:hover{border-color:var(--li2)}
+.at.atrasada{border-color:var(--falta)}
+.at .tag{display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.03em;padding:2px 7px;border-radius:4px;background:var(--azul-bg);color:var(--azul);margin-bottom:7px}
+.at .tit{font-size:14px;font-weight:500;line-height:1.4;margin:0 0 9px;width:100%;border:1px solid transparent;background:transparent;border-radius:4px;padding:2px 4px;resize:none;overflow:hidden;font-family:inherit}
+.at .tit:hover{border-color:var(--li)} .at .tit:focus{border-color:var(--azul);background:var(--card2);outline:none}
+.at .meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--tx2)}
+.at .meta input{border:1px solid transparent;background:transparent;border-radius:4px;padding:2px 5px;font-size:12px;max-width:118px}
+.at .meta input:hover{border-color:var(--li)} .at .meta input:focus{border-color:var(--azul);background:var(--card2);outline:none}
+.at .meta input.dt{font-family:var(--m);font-size:11.5px}
+.at .atraso{font-size:10.5px;font-weight:600;color:var(--falta);text-transform:uppercase;letter-spacing:.04em}
+.at .pe{display:flex;gap:4px;align-items:center;margin-top:9px;padding-top:9px;border-top:1px solid var(--li)}
+.at .pe .mv{font-size:11.5px;font-weight:500;padding:4px 8px;border-radius:5px;border:1px solid var(--li2);background:transparent;cursor:pointer;color:var(--tx2)}
+.at .pe .mv:hover{background:var(--card2);color:var(--tx)}
+.at .pe .esq{margin-left:auto;display:flex;gap:3px}
+
+/* subtarefas */
+.subs{margin:9px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px}
+.subs li{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--tx2)}
+.subs li input[type=checkbox]{accent-color:var(--feito);width:14px;height:14px;flex:none;cursor:pointer;margin:0}
+.subs li .st{flex:1;border:1px solid transparent;background:transparent;border-radius:4px;padding:1px 4px;font-size:12.5px;min-width:0}
+.subs li .st:hover{border-color:var(--li)} .subs li .st:focus{border-color:var(--azul);background:var(--card2);outline:none}
+.subs li.ok .st{text-decoration:line-through;color:var(--tx3)}
+.subs li .x{opacity:0;border:0;background:transparent;color:var(--tx3);cursor:pointer;padding:0 3px;font-size:13px}
+.subs li:hover .x{opacity:1}
+.subs .add{font-size:12px;color:var(--tx3);border:0;background:transparent;cursor:pointer;padding:2px 4px;text-align:left}
+.subs .add:hover{color:var(--azul)}
+.cont{font-family:var(--m);font-size:11px;color:var(--tx3)}
+
+.vazio{font-size:13px;color:var(--tx3);text-align:center;padding:20px 8px;font-style:italic}
+.novo{width:100%;border:1px dashed var(--li2);background:transparent;border-radius:7px;padding:9px;font-size:13px;color:var(--tx3);cursor:pointer;margin-top:8px}
+.novo:hover{border-color:var(--azul);color:var(--azul)}
+
+footer{border-top:1px solid var(--li);padding:22px 0 40px;font-size:12.5px;color:var(--tx3)}
+footer p{max-width:80ch;margin:0 0 8px;line-height:1.55}
+footer b{color:var(--tx2)}
+footer code{font-family:var(--m);font-size:11.5px}
+
+dialog{border:1px solid var(--li2);border-radius:10px;background:var(--card);color:var(--tx);padding:0;max-width:620px;width:calc(100% - 28px);box-shadow:0 20px 60px -20px rgba(0,0,0,.4)}
+dialog::backdrop{background:rgba(15,18,21,.45)}
+dialog .dh{padding:18px 20px 0} dialog h2{font-size:17px;font-weight:700;margin:0 0 6px}
+dialog .dc{padding:8px 20px 16px} dialog p{font-size:13.5px;color:var(--tx2);margin:0 0 11px;line-height:1.5}
+dialog .df{display:flex;gap:8px;justify-content:flex-end;padding:13px 20px;border-top:1px solid var(--li);background:var(--card2);flex-wrap:wrap}
+dialog textarea{width:100%;height:180px;font-family:var(--m);font-size:11.5px;border:1px solid var(--li2);border-radius:6px;padding:9px;background:var(--bg);resize:vertical}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(8px);background:var(--tx);color:var(--bg);font-size:13px;font-weight:500;padding:9px 16px;border-radius:7px;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;z-index:80}
+.toast.v{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap in">
+  <h1>Painel do ASAS <span>· o que falta e o que está pronto</span></h1>
+  <div class="gap"></div>
+  <button class="b g" id="tema" title="Tema" aria-label="Alternar tema">◐</button>
+  <button class="b" id="importar">Importar</button>
+  <button class="b" id="baixar">Baixar</button>
+  <button class="b p" id="publicar">Publicar</button>
+</div></header>
+
+<main class="wrap">
+  <section class="resumo">
+    <h2 id="linha-topo">carregando</h2>
+    <div class="frentes" id="frentes"></div>
+  </section>
+
+  <div class="filtros">
+    <span class="r">Responsável</span>
+    <select class="s" id="f-resp"></select>
+    <span class="r" style="margin-left:6px">Prazo</span>
+    <button class="b" id="f-atraso" aria-pressed="false">Só atrasados</button>
+    <button class="b g" id="limpar" style="margin-left:auto">Limpar filtros</button>
+  </div>
+
+  <div class="quadro" id="quadro"></div>
+</main>
+
+<footer><div class="wrap">
+  <p><b>Como usar.</b> Clique em qualquer texto e edite. Os botões no pé de cada cartão movem a
+    atividade entre as colunas. <b>+ subtarefa</b> abre um item com caixa de marcar. As caixas
+    do topo filtram por frente — clique de novo para desmarcar.</p>
+  <p><b>Como salvar para a equipe.</b> O que você edita fica no seu navegador na hora. Clique em
+    <b>Publicar</b> para gravar no <code>dados.json</code> do repositório: o painel copia os dados e abre
+    o arquivo no GitHub para você colar e confirmar. Ninguém precisa de token nem senha.</p>
+  <p id="fonte"></p>
+</div></footer>
+
+<dialog id="d-pub"><div class="dh"><h2>Publicar para a equipe</h2></div>
+  <div class="dc"><p>Os dados já foram copiados. No GitHub que vai abrir, selecione tudo, cole por cima e confirme.</p>
+  <textarea id="pub-json" readonly spellcheck="false"></textarea></div>
+  <div class="df"><button class="b" data-x>Fechar</button><button class="b" id="copiar">Copiar de novo</button><button class="b p" id="abrir-gh">Abrir o GitHub</button></div>
+</dialog>
+<dialog id="d-imp"><div class="dh"><h2>Importar dados</h2></div>
+  <div class="dc"><p>Cole um <code>dados.json</code> salvo antes. Isso substitui o que está na tela.</p>
+  <textarea id="imp-json" spellcheck="false"></textarea></div>
+  <div class="df"><button class="b" data-x>Cancelar</button><button class="b p" id="imp-ok">Substituir</button></div>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ─── configuração: a única linha a preencher ───────────────────────────── */
+const REPO = 'Labtech-Teilhard/painel-asas';
+const RAMO = 'main', ARQ = 'dados.json';
+
+/* ─── os dados ──────────────────────────────────────────────────────────────
+   status: 'falta' | 'anda' | 'feito'   ·   prazo: 'AAAA-MM-DD' ou ''
+   ──────────────────────────────────────────────────────────────────────── */
+const SEMENTE = {
+  meta: { atualizado:'2026-08-20',
+    fonte:'Estrutura e modelo de preenchimento: planilha Pendências do Sistema ASAS (20/08/2026). Estado da documentação medido na pasta do OneDrive em 20/08/2026: 37 documentos não-obsoletos, 35 .md e 35 .docx, 26 já acima da v1.0, e 0 com aprovador preenchido.' },
+  frentes: ['CIApp','Visual 3D Hair','Ábaco','Planejamento e Admin','PEP','Documentações','Nuvem'],
+  atividades: [
+    /* ── CIApp ─────────────────────────────────────────────────────────── */
+    {id:'c1',f:'CIApp',t:'Contagem ao vivo, idempotência e lote',r:'Pedro',p:'',s:'feito',subs:[]},
+    {id:'c2',f:'CIApp',t:'Fila local com pendentes e ressincronização',r:'Pedro',p:'',s:'feito',subs:[]},
+    {id:'c3',f:'CIApp',t:'Zerar por estorno em lote, com confirmação digitada',r:'Pedro',p:'',s:'feito',subs:[]},
+    {id:'c4',f:'CIApp',t:'Testes de unidade, integração e segurança',r:'Pedro',p:'',s:'feito',
+      subs:[{t:'813 casos passando em 20/08/2026',ok:true},{t:'ruff e tsc sem achado',ok:true}]},
+    {id:'c5',f:'CIApp',t:'Teste de regressão e aceitação final',r:'Pedro',p:'',s:'anda',subs:[]},
+
+    /* ── Visual 3D Hair ────────────────────────────────────────────────── */
+    {id:'v1',f:'Visual 3D Hair',t:'Planejamento 3D',r:'João',p:'',s:'feito',subs:[]},
+    {id:'v2',f:'Visual 3D Hair',t:'Integração com a Meshy.ai',r:'João',p:'',s:'feito',
+      subs:[{t:'Cliente da API no código, modelo meshy-7',ok:true},{t:'Escala ancorada na medida do próprio modelo',ok:true}]},
+    {id:'v3',f:'Visual 3D Hair',t:'Publicar a chave da Meshy no ambiente do servidor',r:'Pedro',p:'',s:'anda',
+      subs:[{t:'config.py deixou de depender do diretório de partida',ok:true},{t:'Copiar a chave para o .env que o servidor lê',ok:false},{t:'Reiniciar e confirmar que a geração roda',ok:false}]},
+    {id:'v4',f:'Visual 3D Hair',t:'ML — consolidação e curadoria da base de dados',r:'João',p:'',s:'anda',subs:[]},
+    {id:'v5',f:'Visual 3D Hair',t:'ML — definição das variáveis e das métricas',r:'João',p:'',s:'falta',subs:[]},
+    {id:'v6',f:'Visual 3D Hair',t:'ML — treinamento e ajuste dos modelos',r:'João',p:'',s:'falta',subs:[]},
+    {id:'v7',f:'Visual 3D Hair',t:'ML — validação do desempenho e registro dos resultados',r:'João',p:'',s:'falta',subs:[]},
+    {id:'v8',f:'Visual 3D Hair',t:'ML — integração do modelo ao planejamento',r:'João',p:'',s:'falta',subs:[]},
+
+    /* ── Ábaco ─────────────────────────────────────────────────────────── */
+    {id:'a1',f:'Ábaco',t:'Contadores e decomposição conferidos com o legado',r:'Pedro',p:'',s:'feito',subs:[]},
+    {id:'a2',f:'Ábaco',t:'Integração com a API',r:'Pedro',p:'',s:'feito',subs:[]},
+
+    /* ── Planejamento e Admin ──────────────────────────────────────────── */
+    {id:'p1',f:'Planejamento e Admin',t:'Planejamento',r:'Pedro',p:'',s:'feito',subs:[]},
+    {id:'p2',f:'Planejamento e Admin',t:'Administração e configuração de fórmulas',r:'Pedro',p:'',s:'feito',subs:[]},
+
+    /* ── PEP ───────────────────────────────────────────────────────────── */
+    {id:'e1',f:'PEP',t:'Sete seções nas rotas reais, CPF validado e busca de duplicata',r:'Thiago',p:'',s:'feito',subs:[]},
+    {id:'e2',f:'PEP',t:'Levantar com a equipe clínica as novas demandas',r:'Thiago',p:'',s:'anda',
+      subs:[{t:'Sem esta lista os passos seguintes não têm escopo',ok:false}]},
+    {id:'e3',f:'PEP',t:'Especificação e aprovação dos requisitos novos',r:'Thiago',p:'',s:'falta',subs:[]},
+    {id:'e4',f:'PEP',t:'Implementação das novas funcionalidades',r:'Thiago',p:'',s:'falta',
+      subs:[{t:'Atenção: campo de alergia, prescrição ou dose muda a classe de segurança do módulo — decidir antes de codificar',ok:false}]},
+    {id:'e5',f:'PEP',t:'Testes e validação com o usuário',r:'Thiago',p:'',s:'falta',subs:[]},
+    {id:'e6',f:'PEP',t:'Atualização dos requisitos no dossiê',r:'Thiago',p:'',s:'falta',subs:[]},
+
+    /* ── Documentações ─────────────────────────────────────────────────── */
+    {id:'d1',f:'Documentações',t:'Redação dos 37 documentos do dossiê',r:'Pedro',p:'',s:'feito',
+      subs:[{t:'35 em .md e 35 exportados em .docx, mais 2 PDFs',ok:true},{t:'Dez pastas, do regulatório à rotulagem',ok:true}]},
+    {id:'d2',f:'Documentações',t:'Revisão dos documentos',r:'Pedro',p:'',s:'feito',
+      subs:[{t:'26 dos 37 já passaram da v1.0',ok:true}]},
+    {id:'d3',f:'Documentações',t:'Registros de execução emitidos',r:'Pedro',p:'',s:'feito',
+      subs:[{t:'Verificação de unidade, testes do mapa 3D, malha e segurança',ok:true}]},
+    {id:'d4',f:'Documentações',t:'Atualizar os documentos afetados pelas pendências',r:'Pedro',p:'',s:'anda',subs:[]},
+    {id:'d5',f:'Documentações',t:'Aprovação formal dos documentos',r:'',p:'',s:'falta',
+      subs:[{t:'0 de 37 têm aprovador preenchido na lista mestre',ok:false},{t:'Depende de conta nominal: sem ela o “aprovado por” não identifica pessoa',ok:false}]},
+    {id:'d6',f:'Documentações',t:'Fechamento da lista mestre e das evidências',r:'',p:'',s:'falta',
+      subs:[{t:'A lista mestre é gerada, nunca editada à mão',ok:false}]},
+    {id:'d7',f:'Documentações',t:'Compilação final do dossiê',r:'',p:'',s:'falta',subs:[]},
+
+    /* ── Nuvem ─────────────────────────────────────────────────────────── */
+    {id:'n1',f:'Nuvem',t:'Definição do provedor e do plano',r:'',p:'',s:'falta',subs:[]},
+    {id:'n2',f:'Nuvem',t:'Contratação e configuração do ambiente',r:'',p:'',s:'falta',subs:[]},
+    {id:'n3',f:'Nuvem',t:'Publicação da versão de homologação',r:'',p:'',s:'falta',subs:[]},
+    {id:'n4',f:'Nuvem',t:'Backup, monitoramento e controle de acesso',r:'',p:'',s:'falta',subs:[]},
+    {id:'n5',f:'Nuvem',t:'Validação do ambiente pela equipe',r:'',p:'',s:'falta',subs:[]},
+  ],
+};
+
+/* ─── mecanismo ─────────────────────────────────────────────────────────── */
+const COLS = { falta:'Faltando', anda:'Em andamento', feito:'Concluído' };
+const K = 'painel-asas-v2';
+const $ = (s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc = (t)=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const hoje = ()=>new Date().toISOString().slice(0,10);
+const uid = ()=>'x'+Math.random().toString(36).slice(2,9);
+const cofre = { ler:k=>{try{return localStorage.getItem(k)}catch(e){return null}},
+                gravar:(k,v)=>{try{localStorage.setItem(k,v);return true}catch(e){return false}} };
+
+let D=null, fFrente=null, fResp='', fAtraso=false;
+const atrasada = a => a.p && a.s!=='feito' && a.p < hoje();
+
+function gravar(){ D.meta.atualizado=hoje(); cofre.gravar(K,JSON.stringify(D)); }
+
+async function carregar(){
+  let base = SEMENTE;
+  try { const r = await fetch(ARQ,{cache:'no-store'}); if(r.ok) base = await r.json(); } catch(e){}
+  let loc=null; try{ loc = JSON.parse(cofre.ler(K)||'null'); }catch(e){}
+  const esc_ = (loc && Array.isArray(loc.atividades)) ? loc : base;
+  D = typeof structuredClone==='function' ? structuredClone(esc_) : JSON.parse(JSON.stringify(esc_));
+}
+
+const visiveis = ()=> D.atividades.filter(a =>
+  (!fFrente || a.f===fFrente) && (!fResp || a.r===fResp) && (!fAtraso || atrasada(a)));
+
+/* ─── resumo por frente ─────────────────────────────────────────────────── */
+function pintarResumo(){
+  const t = D.atividades, feito = t.filter(a=>a.s==='feito').length, atr = t.filter(atrasada).length;
+  $('#linha-topo').textContent =
+    `${feito} de ${t.length} atividades concluídas · ${t.filter(a=>a.s==='anda').length} em andamento · `
+    + `${t.filter(a=>a.s==='falta').length} faltando` + (atr?` · ${atr} atrasadas`:'');
+
+  $('#frentes').innerHTML = D.frentes.map(f=>{
+    const l = D.atividades.filter(a=>a.f===f);
+    const fe = l.filter(a=>a.s==='feito').length, an = l.filter(a=>a.s==='anda').length;
+    const fa = l.length-fe-an, pc = l.length?Math.round(fe/l.length*100):0;
+    return `<button class="fr" data-frente="${esc(f)}" aria-pressed="${fFrente===f}">
+      <div class="n"><b>${esc(f)}</b><em>${pc}%</em></div>
+      <div class="barra">
+        <i class="i-feito" style="width:${l.length?fe/l.length*100:0}%"></i>
+        <i class="i-anda"  style="width:${l.length?an/l.length*100:0}%"></i>
+      </div>
+      <div class="l">
+        ${fa?`<span class="c-falta"><s>${fa}</s> faltando</span>`:''}
+        ${an?`<span class="c-anda"><s>${an}</s> em andamento</span>`:''}
+        ${fe?`<span class="c-feito"><s>${fe}</s> pronto</span>`:''}
+      </div></button>`;
+  }).join('');
+}
+
+/* ─── cartão ────────────────────────────────────────────────────────────── */
+function cartao(a){
+  const i = D.atividades.indexOf(a);
+  const mover = Object.entries(COLS).filter(([k])=>k!==a.s)
+    .map(([k,v])=>`<button class="mv" data-mover="${k}" data-i="${i}">${k==='feito'?'✓ ':''}${v}</button>`).join('');
+  const nSub = a.subs.length, okSub = a.subs.filter(s=>s.ok).length;
+  return `<div class="at ${atrasada(a)?'atrasada':''}">
+    <span class="tag">${esc(a.f)}</span>
+    <textarea class="tit" rows="1" data-i="${i}" data-c="t" aria-label="Atividade">${esc(a.t)}</textarea>
+    <div class="meta">
+      <input data-i="${i}" data-c="r" value="${esc(a.r)}" placeholder="quem" aria-label="Responsável">
+      <input class="dt" type="date" data-i="${i}" data-c="p" value="${esc(a.p)}" aria-label="Prazo">
+      ${atrasada(a)?'<span class="atraso">atrasada</span>':''}
+      ${nSub?`<span class="cont">${okSub}/${nSub}</span>`:''}
+    </div>
+    <ul class="subs">
+      ${a.subs.map((s,j)=>`<li class="${s.ok?'ok':''}">
+        <input type="checkbox" data-i="${i}" data-j="${j}" ${s.ok?'checked':''} aria-label="Concluir subtarefa">
+        <input class="st" data-i="${i}" data-j="${j}" value="${esc(s.t)}" aria-label="Subtarefa">
+        <button class="x" data-subx data-i="${i}" data-j="${j}" title="Apagar subtarefa">✕</button></li>`).join('')}
+      <li><button class="add" data-subadd data-i="${i}">+ subtarefa</button></li>
+    </ul>
+    <div class="pe">${mover}<span class="esq"><button class="b d" data-apagar data-i="${i}" title="Apagar atividade">✕</button></span></div>
+  </div>`;
+}
+
+function pintar(){
+  const resps=[...new Set(D.atividades.map(a=>a.r).filter(Boolean))].sort();
+  $('#f-resp').innerHTML = `<option value="">todos</option>`+resps.map(r=>`<option ${fResp===r?'selected':''}>${esc(r)}</option>`).join('');
+  $('#f-atraso').setAttribute('aria-pressed',String(fAtraso));
+
+  const v = visiveis();
+  $('#quadro').innerHTML = Object.entries(COLS).map(([k,rot])=>{
+    const l = v.filter(a=>a.s===k);
+    return `<section class="col col-${k}">
+      <h3><span class="pt"></span>${rot}<span class="qt">${l.length}</span></h3>
+      <div class="lista">${l.map(cartao).join('') || '<p class="vazio">nada aqui</p>'}</div>
+      <button class="novo" data-nova="${k}">+ atividade</button>
+    </section>`;
+  }).join('');
+
+  $$('.tit').forEach(t=>{ t.style.height='auto'; t.style.height=t.scrollHeight+'px'; });
+  pintarResumo();
+  $('#fonte').textContent = D.meta.fonte||'';
+}
+
+/* ─── edição ────────────────────────────────────────────────────────────── */
+document.addEventListener('input',e=>{
+  const el=e.target.closest('[data-i]'); if(!el||!D) return;
+  const a=D.atividades[+el.dataset.i];
+  if(el.dataset.c){ a[el.dataset.c]=el.value; if(el.dataset.c==='t'){el.style.height='auto';el.style.height=el.scrollHeight+'px';} }
+  else if(el.classList.contains('st')) a.subs[+el.dataset.j].t=el.value;
+  else return;
+  gravar(); pintarResumo();
+});
+document.addEventListener('change',e=>{
+  const cb=e.target.closest('input[type=checkbox][data-j]'); if(!cb||!D) return;
+  D.atividades[+cb.dataset.i].subs[+cb.dataset.j].ok=cb.checked; gravar(); pintar();
+});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b||!D) return;
+  const i=+b.dataset.i;
+  if(b.dataset.mover){ D.atividades[i].s=b.dataset.mover; gravar(); pintar(); aviso(`Movida para ${COLS[b.dataset.mover]}`); return; }
+  if(b.hasAttribute('data-apagar')){ if(!confirm(`Apagar "${D.atividades[i].t||'esta atividade'}"?`))return;
+    D.atividades.splice(i,1); gravar(); pintar(); aviso('Atividade apagada'); return; }
+  if(b.hasAttribute('data-subadd')){ D.atividades[i].subs.push({t:'',ok:false}); gravar(); pintar();
+    const c=$$('.at')[0]; setTimeout(()=>{const s=$$(`.st[data-i="${i}"]`);s.length&&s[s.length-1].focus()},0); return; }
+  if(b.hasAttribute('data-subx')){ D.atividades[i].subs.splice(+b.dataset.j,1); gravar(); pintar(); return; }
+  if(b.dataset.nova){ D.atividades.push({id:uid(),f:fFrente||D.frentes[0],t:'',r:'',p:'',s:b.dataset.nova,subs:[]});
+    gravar(); pintar(); const t=$$('.tit'); t.length&&t[t.length-1].focus(); return; }
+  if(b.dataset.frente!==undefined){ fFrente = fFrente===b.dataset.frente?null:b.dataset.frente; pintar(); return; }
+  if(b.id==='f-atraso'){ fAtraso=!fAtraso; pintar(); return; }
+  if(b.id==='limpar'){ fFrente=null; fResp=''; fAtraso=false; pintar(); return; }
+  if(b.hasAttribute('data-x')){ b.closest('dialog').close(); return; }
+});
+$('#f-resp').addEventListener('change',e=>{fResp=e.target.value;pintar()});
+
+/* ─── salvar ────────────────────────────────────────────────────────────── */
+const txt=()=>JSON.stringify(D,null,2);
+function aviso(t){const el=$('#toast');el.textContent=t;el.classList.add('v');clearTimeout(aviso._t);aviso._t=setTimeout(()=>el.classList.remove('v'),2200);}
+$('#baixar').addEventListener('click',()=>{
+  const u=URL.createObjectURL(new Blob([txt()],{type:'application/json'}));
+  const a=Object.assign(document.createElement('a'),{href:u,download:ARQ});
+  document.body.append(a);a.click();a.remove();URL.revokeObjectURL(u);aviso('dados.json baixado');});
+async function copiar(){try{await navigator.clipboard.writeText(txt());return true}catch(e){$('#pub-json').select();return document.execCommand('copy')}}
+$('#publicar').addEventListener('click',async()=>{
+  $('#pub-json').value=txt();
+  if(!REPO){aviso('Falta preencher REPO no topo do arquivo — baixando o dados.json');$('#baixar').click();return;}
+  $('#d-pub').showModal(); if(await copiar()) aviso('Dados copiados');});
+$('#copiar').addEventListener('click',async()=>{if(await copiar())aviso('Dados copiados')});
+$('#abrir-gh').addEventListener('click',()=>window.open(`https://github.com/${REPO}/edit/${RAMO}/${ARQ}`,'_blank','noopener'));
+$('#importar').addEventListener('click',()=>{$('#imp-json').value='';$('#d-imp').showModal()});
+$('#imp-ok').addEventListener('click',()=>{try{
+  const n=JSON.parse($('#imp-json').value);
+  if(!n||!Array.isArray(n.atividades))throw new Error('sem a lista de atividades');
+  D=n;gravar();pintar();$('#d-imp').close();aviso('Dados substituídos');
+}catch(err){aviso('Não consegui ler esse JSON: '+err.message)}});
+
+/* ─── tema ──────────────────────────────────────────────────────────────── */
+$('#tema').addEventListener('click',()=>{const r=document.documentElement;
+  const esc2 = r.dataset.t ? r.dataset.t==='escuro' : matchMedia('(prefers-color-scheme: dark)').matches;
+  r.dataset.t = esc2?'claro':'escuro'; cofre.gravar(K+'-tema',r.dataset.t);});
+const ts=cofre.ler(K+'-tema'); if(ts) document.documentElement.dataset.t=ts;
+
+carregar().then(pintar);
+</script>
+</body>
+</html>

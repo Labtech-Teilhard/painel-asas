@@ -1,0 +1,406 @@
+{
+  "meta": {
+    "atualizado": "2026-08-20",
+    "fonte": "Estrutura e modelo de preenchimento: planilha Pendências do Sistema ASAS (20/08/2026). Estado da documentação medido na pasta do OneDrive em 20/08/2026: 37 documentos não-obsoletos, 35 .md e 35 .docx, 26 já acima da v1.0, e 0 com aprovador preenchido."
+  },
+  "frentes": [
+    "CIApp",
+    "Visual 3D Hair",
+    "Ábaco",
+    "Planejamento e Admin",
+    "PEP",
+    "Documentações",
+    "Nuvem"
+  ],
+  "atividades": [
+    {
+      "id": "c1",
+      "f": "CIApp",
+      "t": "Contagem ao vivo, idempotência e lote",
+      "r": "Pedro",
+      "p": "",
+      "s": "feito",
+      "subs": []
+    },
+    {
+      "id": "c2",
+      "f": "CIApp",
+      "t": "Fila local com pendentes e ressincronização",
+      "r": "Pedro",
+      "p": "",
+      "s": "feito",
+      "subs": []
+    },
+    {
+      "id": "c3",
+      "f": "CIApp",
+      "t": "Zerar por estorno em lote, com confirmação digitada",
+      "r": "Pedro",
+      "p": "",
+      "s": "feito",
+      "subs": []
+    },
+    {
+      "id": "c4",
+      "f": "CIApp",
+      "t": "Testes de unidade, integração e segurança",
+      "r": "Pedro",
+      "p": "",
+      "s": "feito",
+      "subs": [
+        {
+          "t": "813 casos passando em 20/08/2026",
+          "ok": true
+        },
+        {
+          "t": "ruff e tsc sem achado",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "f": "CIApp",
+      "t": "Teste de regressão e aceitação final",
+      "r": "Pedro",
+      "p": "",
+      "s": "anda",
+      "subs": []
+    },
+    {
+      "id": "v1",
+      "f": "Visual 3D Hair",
+      "t": "Planejamento 3D",
+      "r": "João",
+      "p": "",
+      "s": "feito",
+      "subs": []
+    },
+    {
+      "id": "v2",
+      "f": "Visual 3D Hair",
+      "t": "Integração com a Meshy.ai",
+      "r": "João",
+      "p": "",
+      "s": "feito",
+      "subs": [
+        {
+          "t": "Cliente da API no código, modelo meshy-7",
+          "ok": true
+        },
+        {
+          "t": "Escala ancorada na medida do próprio modelo",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "id": "v3",
+      "f": "Visual 3D Hair",
+      "t": "Publicar a chave da Meshy no ambiente do servidor",
+      "r": "Pedro",
+      "p": "",
+      "s": "anda",
+      "subs": [
+        {
+          "t": "config.py deixou de depender do diretório de partida",
+          "ok": true
+        },
+        {
+          "t": "Copiar a chave para o .env que o servidor lê",
+          "ok": false
+        },
+        {
+          "t": "Reiniciar e confirmar que a geração roda",
+          "ok": false
+        }
+      ]
+    },
+    {
+      "id": "v4",
+      "f": "Visual 3D Hair",
+      "t": "ML — consolidação e curadoria da base de dados",
+      "r": "João",
+      "p": "",
+      "s": "anda",
+      "subs": []
+    },
+    {
+      "id": "v5",
+      "f": "Visual 3D Hair",
+      "t": "ML — definição das variáveis e das métricas",
+      "r": "João",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "v6",
+      "f": "Visual 3D Hair",
+      "t": "ML — treinamento e ajuste dos modelos",
+      "r": "João",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "v7",
+      "f": "Visual 3D Hair",
+      "t": "ML — validação do desempenho e registro dos resultados",
+      "r": "João",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "v8",
+      "f": "Visual 3D Hair",
+      "t": "ML — integração do modelo ao planejamento",
+      "r": "João",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "a1",
+      "f": "Ábaco",
+      "t": "Contadores e decomposição conferidos com o legado",
+      "r": "Pedro",
+      "p": "",
+      "s": "feito",
+      "subs": []
+    },
+    {
+      "id": "a2",
+      "f": "Ábaco",
+      "t": "Integração com a API",
+      "r": "Pedro",
+      "p": "",
+      "s": "feito",
+      "subs": []
+    },
+    {
+      "id": "p1",
+      "f": "Planejamento e Admin",
+      "t": "Planejamento",
+      "r": "Pedro",
+      "p": "",
+      "s": "feito",
+      "subs": []
+    },
+    {
+      "id": "p2",
+      "f": "Planejamento e Admin",
+      "t": "Administração e configuração de fórmulas",
+      "r": "Pedro",
+      "p": "",
+      "s": "feito",
+      "subs": []
+    },
+    {
+      "id": "e1",
+      "f": "PEP",
+      "t": "Sete seções nas rotas reais, CPF validado e busca de duplicata",
+      "r": "Thiago",
+      "p": "",
+      "s": "feito",
+      "subs": []
+    },
+    {
+      "id": "e2",
+      "f": "PEP",
+      "t": "Levantar com a equipe clínica as novas demandas",
+      "r": "Thiago",
+      "p": "",
+      "s": "anda",
+      "subs": [
+        {
+          "t": "Sem esta lista os passos seguintes não têm escopo",
+          "ok": false
+        }
+      ]
+    },
+    {
+      "id": "e3",
+      "f": "PEP",
+      "t": "Especificação e aprovação dos requisitos novos",
+      "r": "Thiago",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "e4",
+      "f": "PEP",
+      "t": "Implementação das novas funcionalidades",
+      "r": "Thiago",
+      "p": "",
+      "s": "falta",
+      "subs": [
+        {
+          "t": "Atenção: campo de alergia, prescrição ou dose muda a classe de segurança do módulo — decidir antes de codificar",
+          "ok": false
+        }
+      ]
+    },
+    {
+      "id": "e5",
+      "f": "PEP",
+      "t": "Testes e validação com o usuário",
+      "r": "Thiago",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "e6",
+      "f": "PEP",
+      "t": "Atualização dos requisitos no dossiê",
+      "r": "Thiago",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "d1",
+      "f": "Documentações",
+      "t": "Redação dos 37 documentos do dossiê",
+      "r": "Pedro",
+      "p": "",
+      "s": "feito",
+      "subs": [
+        {
+          "t": "35 em .md e 35 exportados em .docx, mais 2 PDFs",
+          "ok": true
+        },
+        {
+          "t": "Dez pastas, do regulatório à rotulagem",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "id": "d2",
+      "f": "Documentações",
+      "t": "Revisão dos documentos",
+      "r": "Pedro",
+      "p": "",
+      "s": "feito",
+      "subs": [
+        {
+          "t": "26 dos 37 já passaram da v1.0",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "id": "d3",
+      "f": "Documentações",
+      "t": "Registros de execução emitidos",
+      "r": "Pedro",
+      "p": "",
+      "s": "feito",
+      "subs": [
+        {
+          "t": "Verificação de unidade, testes do mapa 3D, malha e segurança",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "id": "d4",
+      "f": "Documentações",
+      "t": "Atualizar os documentos afetados pelas pendências",
+      "r": "Pedro",
+      "p": "",
+      "s": "anda",
+      "subs": []
+    },
+    {
+      "id": "d5",
+      "f": "Documentações",
+      "t": "Aprovação formal dos documentos",
+      "r": "",
+      "p": "",
+      "s": "falta",
+      "subs": [
+        {
+          "t": "0 de 37 têm aprovador preenchido na lista mestre",
+          "ok": false
+        },
+        {
+          "t": "Depende de conta nominal: sem ela o “aprovado por” não identifica pessoa",
+          "ok": false
+        }
+      ]
+    },
+    {
+      "id": "d6",
+      "f": "Documentações",
+      "t": "Fechamento da lista mestre e das evidências",
+      "r": "",
+      "p": "",
+      "s": "falta",
+      "subs": [
+        {
+          "t": "A lista mestre é gerada, nunca editada à mão",
+          "ok": false
+        }
+      ]
+    },
+    {
+      "id": "d7",
+      "f": "Documentações",
+      "t": "Compilação final do dossiê",
+      "r": "",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "n1",
+      "f": "Nuvem",
+      "t": "Definição do provedor e do plano",
+      "r": "",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "n2",
+      "f": "Nuvem",
+      "t": "Contratação e configuração do ambiente",
+      "r": "",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "n3",
+      "f": "Nuvem",
+      "t": "Publicação da versão de homologação",
+      "r": "",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "n4",
+      "f": "Nuvem",
+      "t": "Backup, monitoramento e controle de acesso",
+      "r": "",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    },
+    {
+      "id": "n5",
+      "f": "Nuvem",
+      "t": "Validação do ambiente pela equipe",
+      "r": "",
+      "p": "",
+      "s": "falta",
+      "subs": []
+    }
+  ]
+}
