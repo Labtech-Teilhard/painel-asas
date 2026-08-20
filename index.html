@@ -387,7 +387,11 @@ async function buscarPublicado(){
 }
 
 async function carregar(){
-  const publicado = (NUVEM && await nuvemLer()) || await buscarPublicado() || SEMENTE;
+  const daNuvem = NUVEM ? await nuvemLer() : null;
+  // Linha recem-criada vem vazia. Vazio nao e conteudo: nesse caso o dados.json
+  // publicado ainda manda, para ninguem abrir um painel em branco.
+  const nuvemTemConteudo = daNuvem && daNuvem.atividades.length > 0;
+  const publicado = (nuvemTemConteudo ? daNuvem : null) || await buscarPublicado() || SEMENTE;
   let g=null; try{ g = JSON.parse(cofre.ler(K)||'null'); }catch(e){}
   const local = g && g.doc && Array.isArray(g.doc.atividades) ? g.doc : null;
   sujo = !!(g && g.sujo);
@@ -423,7 +427,9 @@ function banner(pub){
 /* Uma aba aberta o dia todo tem de perceber quando alguém publica. */
 async function conferirPublicado(){
   if(salvando) return;
-  const pub = (NUVEM && await nuvemLer()) || (!NUVEM && await buscarPublicado()); if(!pub) return;
+  let pub = NUVEM ? await nuvemLer() : await buscarPublicado();
+  if(pub && NUVEM && !pub.atividades.length) return;   // nuvem ainda vazia
+  if(!pub) return;
   if(rev(pub) <= rev(D)) return;
   if(sujo){ banner(pub); return; }
   D = copiarDoc(pub); cofre.gravar(K,JSON.stringify({doc:D,sujo:false}));
